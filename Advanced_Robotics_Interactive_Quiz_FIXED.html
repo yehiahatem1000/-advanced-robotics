@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Advanced Robotics Interactive Quiz</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;color:#1f2937}
+.container{max-width:850px;margin:40px auto;padding:24px}
+.card{background:white;border-radius:18px;padding:28px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+h1{text-align:center;margin-top:0}.center{text-align:center}
+button{border:0;border-radius:10px;padding:12px 20px;margin:7px;font-size:16px;cursor:pointer;background:#2563eb;color:white}
+button:hover{opacity:.9}.option{display:block;width:100%;text-align:left;background:#eef2ff;color:#111827;margin:12px 0}
+.option.correct{background:#dcfce7;border:2px solid #16a34a}
+.option.wrong{background:#fee2e2;border:2px solid #dc2626}
+.feedback{padding:16px;border-radius:12px;margin-top:18px;display:none}
+.feedback.correct{background:#dcfce7}.feedback.wrong{background:#fee2e2}
+.hidden{display:none}.progress{margin-bottom:18px;color:#64748b}
+textarea{width:100%;min-height:150px;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font-size:16px;box-sizing:border-box}
+.score{font-size:22px;font-weight:bold;text-align:center;margin:20px}
+.small{color:#64748b}
+</style>
+</head>
+<body>
+<div class="container"><div class="card">
+<div id="start">
+<h1>Advanced Robotics Interactive Quiz</h1>
+<p class="center">75 Questions • MCQ • True/False • Essay</p>
+<p class="center">Choose a section to start. You will receive feedback immediately after each answer.</p>
+<div class="center">
+<button onclick="startSection('mcq')">Start MCQ (30)</button>
+<button onclick="startSection('tf')">Start True/False (30)</button>
+<button onclick="startSection('essay')">Start Essay (15)</button>
+</div>
+</div>
+
+<div id="quiz" class="hidden">
+<div class="progress" id="progress"></div>
+<h2 id="question"></h2>
+<div id="options"></div>
+<div id="feedback" class="feedback"></div>
+<div class="center"><button id="next" class="hidden" onclick="nextQuestion()">Next Question</button></div>
+</div>
+
+<div id="finish" class="hidden">
+<h1>Section Complete 🎉</h1>
+<div id="sectionScore" class="score"></div>
+<div class="center">
+<button id="nextSection" onclick="goNextSection()">Next Section</button>
+<button onclick="location.reload()">Restart Quiz</button>
+</div>
+</div>
+</div></div>
+
+<script>
+const mcq=[
+["What is a robotic manipulator?","A mechanical system of interconnected links and joints.",["A mechanical system of interconnected links and joints.","A software-only control program.","A mobile phone application.","A type of sensor."],"A"],
+["Robot architecture mainly affects the robot's:","Workspace",["Battery level","Workspace","Screen size","Operating system"],"B"],
+["A Cartesian manipulator uses:","Three perpendicular linear motions X, Y, and Z",["Three rotary motions","Three perpendicular linear motions X, Y, and Z","One rotary motion only","Two flexible cables"],"B"],
+["The workspace of a Cartesian manipulator is generally:","Rectangular",["Spherical","Circular","Rectangular","Cylindrical"],"C"],
+["Which is an application of Cartesian manipulators?","3D printing",["3D printing","Painting only","Satellite communication","Underwater swimming"],"A"],
+["A cylindrical manipulator combines:","Rotary and linear motion",["Only rotary motion","Only linear motion","Rotary and linear motion","Walking motion"],"C"],
+["The workspace of a cylindrical manipulator is roughly:","Cylindrical",["Rectangular","Cylindrical","Spherical","Flat"],"B"],
+["SCARA stands for:","Selective Compliance Assembly Robot Arm",["Selective Compliance Assembly Robot Arm","Simple Computer Automated Robotic Arm","Special Circular Assembly Robot Architecture","System Control Automated Robot Arm"],"A"],
+["SCARA robots are known for:","Fast repetitive assembly",["Slow exploration","Fast repetitive assembly","Underwater inspection","Space travel"],"B"],
+["SCARA has flexibility mainly in the:","Horizontal plane",["Vertical plane only","Horizontal plane","Underwater plane","Space plane"],"B"],
+["Which is a SCARA application?","Electronic component insertion",["Electronic component insertion","Deep-sea exploration","Aerial photography","Satellite launching"],"A"],
+["Articulated manipulators mainly use:","Rotary joints through links",["Only linear joints","Rotary joints through links","No joints","Wheels only"],"B"],
+["A common industrial articulated robot has:","Six degrees of freedom",["One DOF","Two DOF","Six degrees of freedom","Twenty DOF"],"C"],
+["A major advantage of articulated robots is:","Flexibility",["Very limited motion","Flexibility","No orientation control","Only linear movement"],"B"],
+["Which is an application of articulated robots?","Welding",["Welding","Only 3D printing","Only packaging","Only satellite communication"],"A"],
+["A parallel manipulator uses:","Several kinematic chains connecting the base to a moving platform",["One wheel","Several kinematic chains connecting the base to a moving platform","Only one linear actuator","No moving platform"],"B"],
+["A key characteristic of parallel robots is:","High stiffness",["Low stiffness","High stiffness","No repeatability","Very high moving mass"],"B"],
+["The Delta robot is an example of a:","Parallel robot",["Cartesian robot","Cylindrical robot","Parallel robot","Mobile robot"],"C"],
+["Delta robots are commonly used for:","High-speed pick-and-place",["High-speed pick-and-place","Underwater navigation","Space walking","Medical diagnosis"],"A"],
+["Industrial robots are mainly associated with:","Manufacturing",["Manufacturing","Social media","Web browsing","Music production"],"A"],
+["Collaborative robots are designed to work in:","Shared human-robot workspaces",["Empty warehouses only","Shared human-robot workspaces","Outer space","Underwater environments only"],"B"],
+["Mobile robots commonly use:","Wheels or legs",["Wheels or legs","Only fixed joints","Only cameras","Only cables"],"A"],
+["Aerial robots operate:","In the air",["Underwater","In the air","Underground","Inside engines only"],"B"],
+["Underwater robots are used:","Below the water surface",["Below the water surface","Only in factories","Only in aircraft","Only on roads"],"A"],
+["Space robots can be used for:","Satellite servicing",["Satellite servicing","3D printing only","Packaging only","Office work"],"A"],
+["Robot architecture should be selected according to:","Task requirements",["Color","Brand name","Task requirements","Screen resolution"],"C"],
+["The first factor in the architecture selection sequence is:","Task",["Accuracy","Payload","Task","Architecture"],"C"],
+["High-speed small electronics applications may use:","SCARA or parallel robots",["Only mobile robots","SCARA or parallel robots","Only underwater robots","Only aerial robots"],"B"],
+["Welding that requires different tool orientations may use:","A multi-axis articulated robot",["A multi-axis articulated robot","A fixed table","Only a Cartesian robot","Only a mobile robot"],"A"],
+["Which sequence is correct?","Task → Workspace → Payload → Speed → Accuracy → Motion capability → Architecture",["Architecture → Task → Speed → Payload","Task → Workspace → Payload → Speed → Accuracy → Motion capability → Architecture","Speed → Task → Architecture → Workspace","Payload → Architecture → Task → Accuracy"],"B"]
+];
+
+const tf=[
+["A robotic manipulator is a mechanical system of interconnected links and joints.",true],
+["An advanced robotic manipulator is simply a robot with more joints.",false,"An advanced manipulator is not simply a robot with more joints; its architecture may provide higher speed, stiffness, flexibility, redundancy, or specialized capabilities."],
+["Robot architecture affects workspace.",true],
+["Robot architecture has no effect on accuracy.",false,"Architecture influences capabilities including accuracy and workspace."],
+["A Cartesian manipulator uses three perpendicular linear motions.",true],
+["The workspace of a Cartesian manipulator is spherical.",false,"Cartesian manipulators have a rectangular workspace."],
+["Cartesian manipulators have relatively simple control.",true],
+["3D printing is an application of Cartesian manipulators.",true],
+["A cylindrical manipulator uses only linear motion.",false,"A cylindrical manipulator combines rotary and linear motion."],
+["A cylindrical manipulator has a roughly cylindrical workspace.",true],
+["SCARA stands for Selective Compliance Assembly Robot Arm.",true],
+["SCARA robots are designed for slow and irregular assembly.",false,"SCARA robots are known for fast repetitive assembly."],
+["SCARA flexibility is mainly in the horizontal plane.",true],
+["Electronic assembly is an application of SCARA robots.",true],
+["Articulated manipulators use rotary joints through links.",true],
+["A common industrial articulated robot has three degrees of freedom.",false,"A common industrial articulated configuration has six degrees of freedom."],
+["Flexibility is a major advantage of articulated robots.",true],
+["Articulated robots are used only for welding.",false,"They can be used for welding, painting, assembly, material handling, inspection, and machining."],
+["Parallel manipulators use several kinematic chains.",true],
+["Parallel robots can provide high stiffness and repeatability.",true],
+["Parallel robots have high moving mass.",false,"Parallel robots have low moving mass."],
+["The Delta robot is an example of a parallel robot.",true],
+["Industrial robots are mainly used in manufacturing.",true],
+["Cobots can operate in shared human-robot workspaces.",true],
+["Mobile robots may use wheels or legs.",true],
+["Aerial robots operate below the water surface.",false,"Aerial robots operate in the air."],
+["Underwater robots can be used for exploration and infrastructure inspection.",true],
+["One robot configuration is suitable for every application.",false,"Different applications require different robot architectures."],
+["Architecture selection depends on task, workspace, payload, speed, and accuracy.",true],
+["Welding requiring different tool orientations may require a multi-axis articulated robot.",true]
+];
+
+const essay=[
+["Define a robotic manipulator.","A robotic manipulator is a mechanical system made of interconnected links and joints designed to perform controlled movements."],
+["What is an advanced robotic manipulator?","An advanced manipulator uses architecture that provides enhanced capabilities such as speed, stiffness, flexibility, redundancy, or specialized functions."],
+["What factors are affected by robot architecture?","Architecture affects workspace, speed, accuracy, payload, stiffness, flexibility, and suitability for the application."],
+["What are the main characteristics of Cartesian manipulators?","They use three perpendicular linear motions, have a rectangular workspace, simple structure, high accuracy, and simple control."],
+["Give applications of Cartesian manipulators.","Common applications include 3D printing, material handling, CNC operations, and assembly."],
+["Describe a cylindrical manipulator.","A cylindrical manipulator combines rotary and linear motion and produces a roughly cylindrical workspace."],
+["What does SCARA mean and what is its purpose?","SCARA means Selective Compliance Assembly Robot Arm and is designed for fast repetitive assembly tasks."],
+["What are the main characteristics of SCARA robots?","They provide horizontal flexibility, high vertical stiffness, and fast repetitive motion."],
+["What is an articulated manipulator?","It is a robot using rotary joints through links, commonly providing six degrees of freedom for flexible positioning and orientation."],
+["What is a major advantage of articulated robots?","Their major advantage is flexibility, allowing position and orientation over a large workspace."],
+["What is a parallel manipulator?","A parallel manipulator uses several kinematic chains connecting the base to a moving platform."],
+["What are key characteristics of parallel manipulators?","They provide high stiffness, high acceleration, high repeatability, and low moving mass."],
+["How can robots be classified by environment or application?","They can be classified as industrial, collaborative, mobile, aerial, underwater, and space robots."],
+["What factors should be considered when selecting robot architecture?","Consider task, workspace, payload, speed, accuracy, motion capability, and then choose the suitable architecture."],
+["Why is selecting the appropriate robot architecture important?","The architecture strongly influences robot capabilities and determines how suitable the robot is for a specific task."]
+];
+
+let section="",index=0,score=0,totalScore=0;
+const order=["mcq","tf","essay"];
+
+function startSection(s){section=s;index=0;score=0;document.getElementById("start").classList.add("hidden");document.getElementById("quiz").classList.remove("hidden");render();}
+function render(){
+ document.getElementById("progress").textContent=(section==="mcq"?"MCQ":section==="tf"?"True/False":"Essay")+" • Question "+(index+1)+" / "+(section==="mcq"?30:section==="tf"?30:15);
+ const q=section==="mcq"?mcq[index]:section==="tf"?tf[index]:essay[index];
+ document.getElementById("question").textContent=q[0];
+ const opts=document.getElementById("options");opts.innerHTML="";
+ const fb=document.getElementById("feedback");fb.style.display="none";fb.className="feedback";fb.innerHTML="";
+ document.getElementById("next").classList.add("hidden");
+ if(section==="essay"){
+  opts.innerHTML='<textarea id="answer" placeholder="Write your answer here..."></textarea><div class="center"><button onclick="showEssay()">Show Model Answer</button></div>';
+ }else{
+  if(section==="mcq"){
+   q[2].forEach((x,i)=>{let b=document.createElement("button");b.className="option";b.textContent=String.fromCharCode(65+i)+". "+x;b.onclick=()=>answerMCQ(i,b);opts.appendChild(b);});
+  }else{
+   ["True","False"].forEach((x,i)=>{let b=document.createElement("button");b.className="option";b.textContent=x;b.onclick=()=>answerTF(i===0,b);opts.appendChild(b);});
+  }
+ }
+}
+function answerMCQ(i,b){
+ const q=mcq[index];document.querySelectorAll(".option").forEach(x=>x.disabled=true);
+ const correct=q[3]==="A"?0:q[3]==="B"?1:q[3]==="C"?2:3;
+ if(i===correct){score++;b.classList.add("correct");showFeedback(true,"Correct! "+q[1]);}
+ else{b.classList.add("wrong");document.querySelectorAll(".option")[correct].classList.add("correct");showFeedback(false,"Incorrect. Correct answer: "+q[3]+". "+q[1]);}
+}
+function answerTF(val,b){
+ const q=tf[index];document.querySelectorAll(".option").forEach(x=>x.disabled=true);
+ if(val===q[1]){score++;b.classList.add("correct");showFeedback(true,"Correct! "+(q[2]||"This statement is supported by the lecture."));}
+ else{b.classList.add("wrong");document.querySelectorAll(".option")[q[1]?0:1].classList.add("correct");showFeedback(false,"Incorrect. Correct answer: "+(q[1]?"True":"False")+". "+(q[2]||"Review the lecture statement."));}
+}
+function showFeedback(ok,msg){
+ const fb=document.getElementById("feedback");fb.className="feedback "+(ok?"correct":"wrong");fb.innerHTML="<b>"+(ok?"Correct":"Incorrect")+"</b><br>"+msg;fb.style.display="block";document.getElementById("next").classList.remove("hidden");
+}
+function showEssay(){
+ const q=essay[index],fb=document.getElementById("feedback");fb.className="feedback correct";fb.innerHTML="<b>Model Answer:</b><br>"+q[1];fb.style.display="block";document.getElementById("next").classList.remove("hidden");
+}
+function nextQuestion(){
+ index++;
+ const max=section==="mcq"?30:section==="tf"?30:15;
+ if(index<max)render();else finish();
+}
+function finish(){
+ totalScore+=score;
+ document.getElementById("quiz").classList.add("hidden");document.getElementById("finish").classList.remove("hidden");
+ const max=section==="mcq"?30:section==="tf"?30:15;
+ document.getElementById("sectionScore").textContent=section==="essay"?"Essay section completed. Model answers are provided for self-check.":"Score: "+score+" / "+max;
+ const pos=order.indexOf(section);
+ document.getElementById("nextSection").textContent=pos<2?"Next Section":"Finish Quiz";
+ document.getElementById("nextSection").onclick=pos<2?goNextSection:finalResult;
+}
+function goNextSection(){const pos=order.indexOf(section);startSection(order[pos+1]);}
+function finalResult(){
+ document.getElementById("sectionScore").innerHTML="Quiz Complete 🎉<br><br>Total MCQ + T/F Score: "+totalScore+" / 60<br><span class='small'>Essay questions are self-checked using the model answers.</span>";
+ document.getElementById("nextSection").classList.add("hidden");
+}
+</script>
+</body>
+</html>
